@@ -20,7 +20,6 @@ public class App {
           {'S','F','C','S'},
           {'A','D','E','E'}
         };
-//        final String[] words = { "ABCCED", "SEE", "ABCD" };
         final String[] words = { "ABCCED" };
         final App a = new App();
         for (final String word : words)
@@ -29,11 +28,12 @@ public class App {
 
     public boolean exist(final char[][] board, final String word) {
         final char[] w = word.toCharArray();
-        for (int y = 0; y < board.length; y++) {
-            for (int x = 0; x < board[y].length; x++) {
-                if (exist(board, y, x, w, 0)) return true;
-            }
-        }
+
+        for (int y = 0; y < board.length; y++)
+            for (int x = 0; x < board[y].length; x++)
+                if (exist(board, y, x, w, 0))
+                    return true;
+
         return false;
     }
 

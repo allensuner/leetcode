@@ -1,7 +1,6 @@
 package org.example.leetcode.justify;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class App {
@@ -14,85 +13,65 @@ public class App {
             "for", "your", "country"
         };
         final int maxWidth = 16;
-        final App a = new App();
-        final List<String> justifiedLines = a.fullJustify(words, maxWidth);
+        final List<String> justifiedLines = new App().fullJustify(words, maxWidth);
         justifiedLines.forEach(System.out::println);
     }
 
     public List<String> fullJustify(final String[] words, final int maxWidth) {
-        final List<String> lines = new ArrayList<>();
-        int lineStart = 0;
-        for (int i = 0; i < words.length; ++i) {
-            final String[] currentLine = Arrays.copyOfRange(words, lineStart, i + 1);
-            final int lineLength = getLineLength(currentLine);
-            if (lineLength > maxWidth) {
-                final String line = fillLineWithSpacesJustified(Arrays.copyOfRange(words, lineStart, i), maxWidth);
-                lines.add(line);
-                lineStart = i;
-            }
+        int left = 0;
+        final List<String> result = new ArrayList<>();
+
+        while (left < words.length) {
+            final int right = findRight(left, words, maxWidth);
+            result.add(justify(left, right, words, maxWidth));
+            left = right + 1;
         }
-        final String[] lastWords = Arrays.copyOfRange(words, lineStart, words.length);
-        lines.add(fillLineWithSpacesLeftAligned(lastWords, maxWidth));
-        return lines;
+
+        return result;
     }
 
-    private String fillLineWithSpacesLeftAligned(final String[] wordsOnLine, final int maxWidth) {
-        final StringBuilder sb = new StringBuilder(String.join(" ", wordsOnLine));
-        while (sb.length() < maxWidth)
-            sb.append(' ');
-        return sb.toString();
+    private int findRight(final int left, final String[] words, final int maxWidth) {
+        int right = left;
+        int sum = words[right++].length();
+
+        while (right < words.length && (sum + 1 + words[right].length()) <= maxWidth)
+            sum += (1 + words[right++].length());
+
+        return (right - 1);
     }
 
-    private String fillLineWithSpacesJustified(final String[] wordsOnLine, final int maxWidth) {
-        final int letterLength = Arrays.stream(wordsOnLine).mapToInt(String::length).sum();
-        int totalSpaceLength = maxWidth - letterLength;
-        int numSpaces = wordsOnLine.length - 1;
-        if (numSpaces == 0) {
-            final StringBuilder sb = new StringBuilder(wordsOnLine[0]);
-            while (sb.length() < maxWidth)
-                sb.append(' ');
-            return sb.toString();
-        }
+    private String justify(final int left, final int right, final String[] words, final int maxWidth) {
+        if (right - left == 0)
+            return padResult(words[left], maxWidth);
 
-        final int[] spaceLengths = new int[numSpaces];
-        final String[] spaces = new String[numSpaces];
+        final boolean isLastLine = (right == words.length - 1);
+        final int numSpaces = (right - left);
+        final int totalSpace = (maxWidth - wordsLength(left, right, words));
 
-        //start at total length = k
-        //while k % sections != 0
-        //    k++;
-        //maxLength = k / sections;
-        //maxLength will go for (total - sections) times
-        //go again, treating (total - sections) as maxLength and (total - sections) as sections
-        int x = 0;
-        while (x < spaceLengths.length) {
-            int k = totalSpaceLength;
-            while ((k % numSpaces) != 0)
-                ++k;
-            final int maxSpaceLength = (k / numSpaces);
-            final int n = Math.min((totalSpaceLength - numSpaces), numSpaces);
-            for (int i = 0; i < n; ++i)
-                spaceLengths[x++] = maxSpaceLength;
-            totalSpaceLength = (totalSpaceLength - numSpaces);
-            numSpaces = totalSpaceLength;
-        }
+        final String space = (isLastLine) ? " " : blank(totalSpace / numSpaces);
+        int remainder = (isLastLine) ? 0 : (totalSpace % numSpaces);
 
-        for (int i = 0; i < spaces.length; ++i)
-            spaces[i] = new String(new char[spaceLengths[i]]).replace('\0', ' ');
+        final StringBuilder result = new StringBuilder();
+        for (int i = left; i <= right; i++)
+            result.append(words[i])
+                .append(space)
+                .append((remainder-- > 0) ? " " : "");
 
-        final String[] lineArray = new String[numSpaces + wordsOnLine.length];
-        int j = 0;
-        for (int i = 0; i < wordsOnLine.length; i++) {
-            lineArray[j++] = wordsOnLine[i];
-            if (i < spaces.length)
-                lineArray[j++] = spaces[i];
-        }
-
-        return String.join("", lineArray);
+        return padResult(result.toString().trim(), maxWidth);
     }
 
-    private int getLineLength(final String[] wordsOnLine) {
-        final int letterLength = Arrays.stream(wordsOnLine).mapToInt(String::length).sum();
-        final int spaceLength = wordsOnLine.length - 1;
-        return (letterLength + spaceLength);
+    private int wordsLength(final int left, final int right, final String[] words) {
+        int wordsLength = 0;
+        for (int i = left; i <= right; i++)
+            wordsLength += words[i].length();
+        return wordsLength;
+    }
+
+    private String padResult(final String result, final int maxWidth) {
+        return (result + blank(maxWidth - result.length()));
+    }
+
+    private String blank(final int length) {
+        return new String(new char[length]).replace('\0', ' ');
     }
 }
