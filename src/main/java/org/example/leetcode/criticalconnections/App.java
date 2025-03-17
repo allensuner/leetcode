@@ -15,8 +15,8 @@ public class App {
         connections.add(Arrays.asList(1, 2));
         connections.add(Arrays.asList(2, 0));
         connections.add(Arrays.asList(1, 3));
-        final var criticalConnections = new App().criticalConnections(connections.size(), connections);
-        for (final var criticalConnection : criticalConnections) {
+        final List<List<Integer>> criticalConnections = new App().criticalConnections(connections.size(), connections);
+        for (final List<Integer> criticalConnection : criticalConnections) {
             final String str = String.format("[%d - %d]", criticalConnection.get(0), criticalConnection.get(1));
             System.out.println(str);
         }
