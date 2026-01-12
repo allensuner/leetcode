@@ -2,9 +2,7 @@ package org.example.leetcode.trappingwater2d;
 
 public class App {
 
-    public static void main(String[] args) {
-        //
-        //                  0  1  2
+    public static void main(final String[] args) {
         final int[] map = { 2, 0, 2 };
         System.out.println(new App().trap(map));
     }
